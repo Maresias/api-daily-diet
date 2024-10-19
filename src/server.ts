@@ -1,5 +1,6 @@
 import { app } from './app'
 import { knex } from './database'
+import { env } from './env'
 
 app.get('/hello', async () => {
   const tb = await knex('sqlite_schema').select('*')
@@ -9,7 +10,7 @@ app.get('/hello', async () => {
 
 app
   .listen({
-    port: 3333,
+    port: env.PORT,
   })
   .then(() => {
     console.log('Hello World! ')
