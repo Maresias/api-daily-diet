@@ -12,9 +12,10 @@ declare module 'knex/types/tables' {
       updated_at?: string
     }
     daily_diet: {
+      id: string
       name: string
       description: string
-      my_diet_is_ok: string
+      my_diet_is_ok: number
       created_at: string
       updated_at?: string
       session_id: string

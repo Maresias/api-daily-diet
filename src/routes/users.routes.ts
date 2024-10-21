@@ -13,6 +13,16 @@ export async function usersRoutes(app: FastifyInstance) {
 
     const { name, email, password } = createUserSchemaBody.parse(request.body)
 
+    let sessionId = request.cookies.sessionId
+
+    if (!sessionId) {
+      sessionId = randomUUID()
+      reply.setCookie('sessionId', sessionId, {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 7, // 7 Days
+      })
+    }
+
     await knex('users').insert({
       id: randomUUID(),
       name,
