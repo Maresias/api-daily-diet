@@ -64,9 +64,5 @@ export async function dailyDiet(app: FastifyInstance) {
     const idParamsSchema = z.object({
       id: z.string().uuid(),
     })
-
-    const { id } = idParamsSchema.parse(request.params)
-
-    
   })
 }
