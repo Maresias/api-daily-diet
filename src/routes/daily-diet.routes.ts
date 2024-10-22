@@ -86,7 +86,7 @@ export async function dailyDiet(app: FastifyInstance) {
     return reply.code(200).send()
   })
 
-  app.get('/list', async (request) => {
+  app.get('/lists', async (request) => {
     const sessionId = request.cookies.sessionId
     if (!sessionId) {
       throw new Error('session ID not found')
@@ -96,5 +96,26 @@ export async function dailyDiet(app: FastifyInstance) {
       .first()
 
     return { diets }
+  })
+
+  app.get('/:id', async (request) => {
+    const sessionId = request.cookies.sessionId
+    if (!sessionId) {
+      throw new Error('unauthorized')
+    }
+
+    const idParamsSchema = z.object({
+      id: z.string().uuid(),
+    })
+    const { id } = idParamsSchema.parse(request.params)
+
+    const diet = await knex('daily_diet')
+      .where({ session_id: sessionId, id })
+      .first()
+
+    if (!diet) {
+      throw new Error('diet not found')
+    }
+    return { diet }
   })
 }
