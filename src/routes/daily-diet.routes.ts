@@ -50,7 +50,6 @@ export async function dailyDiet(app: FastifyInstance) {
     const sessionId = request.cookies.sessionId
 
     const diet = await knex('daily_diet').where({ session_id: sessionId, id })
-    console.log(diet)
 
     if (!diet.length) {
       throw new Error('diet not found')
@@ -85,5 +84,17 @@ export async function dailyDiet(app: FastifyInstance) {
     await knex('daily_diet').where({ session_id: sessionId, id }).delete()
 
     return reply.code(200).send()
+  })
+
+  app.get('/list', async (request) => {
+    const sessionId = request.cookies.sessionId
+    if (!sessionId) {
+      throw new Error('session ID not found')
+    }
+    const diets = await knex('daily_diet')
+      .where({ session_id: sessionId })
+      .first()
+
+    return { diets }
   })
 }
