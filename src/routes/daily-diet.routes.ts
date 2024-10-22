@@ -91,9 +91,7 @@ export async function dailyDiet(app: FastifyInstance) {
     if (!sessionId) {
       throw new Error('session ID not found')
     }
-    const diets = await knex('daily_diet')
-      .where({ session_id: sessionId })
-      .first()
+    const diets = await knex('daily_diet').where({ session_id: sessionId })
 
     return { diets }
   })
@@ -117,5 +115,38 @@ export async function dailyDiet(app: FastifyInstance) {
       throw new Error('diet not found')
     }
     return { diet }
+  })
+
+  app.get('/metrics', async (request) => {
+    const sessionId = request.cookies.sessionId
+    if (!sessionId) {
+      throw new Error('unauthorized')
+    }
+    const allDiet = await knex('daily_diet')
+      .where({ session_id: sessionId })
+      .count('id', { as: 'Total de refeições registradas' })
+
+    const totalNumberOfMealsWithinTheDiet = await knex('daily_diet')
+      .where({
+        session_id: sessionId,
+      })
+      .sum('my_diet_is_ok', { as: 'total de refeições dentro da dieta' })
+
+    const totalNumberOfMealsOutsideTheDiet = await knex('daily_diet')
+      .count('my_diet_is_ok', { as: 'total de refeições fora da dieta' })
+      .where({ session_id: sessionId })
+      .where('my_diet_is_ok', 0)
+
+    const diets = await knex('daily_diet')
+      .select('my_diet_is_ok')
+      .where({ session_id: sessionId })
+
+    const dietList = diets.map((diet) => {
+      return Object.values(diet)
+    })
+
+    for (let i = 0; i <= dailyDiet.length; i++) {
+      console.log(dailyDiet)
+    }
   })
 }
