@@ -49,6 +49,13 @@ export async function dailyDiet(app: FastifyInstance) {
     const { id } = idParams.parse(request.params)
     const sessionId = request.cookies.sessionId
 
+    const diet = await knex('daily_diet').where({ session_id: sessionId, id })
+    console.log(diet)
+
+    if (!diet.length) {
+      throw new Error('diet not found')
+    }
+
     await knex('daily_diet').where({ session_id: sessionId, id }).update({
       id,
       name,
@@ -64,5 +71,19 @@ export async function dailyDiet(app: FastifyInstance) {
     const idParamsSchema = z.object({
       id: z.string().uuid(),
     })
+    const { id } = idParamsSchema.parse(request.params)
+
+    const sessionId = request.cookies.sessionId
+
+    const diet = await knex('daily_diet').where({ session_id: sessionId, id })
+    console.log(diet)
+
+    if (!diet.length) {
+      throw new Error('diet not found')
+    }
+
+    await knex('daily_diet').where({ session_id: sessionId, id }).delete()
+
+    return reply.code(200).send()
   })
 }
