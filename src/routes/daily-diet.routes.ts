@@ -3,6 +3,7 @@ import { knex } from '../database'
 
 import { z } from 'zod'
 import { randomUUID } from 'crypto'
+import { console } from 'inspector'
 
 export async function dailyDiet(app: FastifyInstance) {
   app.post('/', async (request, reply) => {
@@ -141,12 +142,35 @@ export async function dailyDiet(app: FastifyInstance) {
       .select('my_diet_is_ok')
       .where({ session_id: sessionId })
 
-    const dietList = diets.map((diet) => {
-      return Object.values(diet)
+    const dietList = diets.map((element) => {
+      return `${element.my_diet_is_ok}`
     })
+    let interado = 0
+    let bestSequel = 0
+    let temporarySequence = 0
 
-    for (let i = 0; i <= dailyDiet.length; i++) {
-      console.log(dailyDiet)
+    while (interado <= dietList.length) {
+      if (Number(dietList[interado]) === 1) {
+        temporarySequence += Number(dietList[interado])
+      } else {
+        bestSequel = temporarySequence
+        if (temporarySequence > bestSequel) {
+          bestSequel = temporarySequence
+        }
+        temporarySequence = 0
+      }
+      interado++
+    }
+    const bestSequenceOfMealsWithinTheDiet = [
+      {
+        'Melhor sequência de refeições dentro da dieta': bestSequel,
+      },
+    ]
+    return {
+      allDiet,
+      totalNumberOfMealsWithinTheDiet,
+      totalNumberOfMealsOutsideTheDiet,
+      bestSequenceOfMealsWithinTheDiet,
     }
   })
 }
