@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { randomUUID } from 'crypto'
 import { console } from 'inspector'
 import { checkSessionIdExist } from '../middlewares/check-session-id-exist'
+import { checkDietExist } from '../middlewares/check-diet-exist'
 
 export async function dailyDiet(app: FastifyInstance) {
   app.post(
@@ -36,7 +37,7 @@ export async function dailyDiet(app: FastifyInstance) {
 
   app.patch(
     '/:id',
-    { preHandler: [checkSessionIdExist] },
+    { preHandler: [checkSessionIdExist, checkDietExist] },
     async (request, reply) => {
       const updateSchemaBody = z.object({
         name: z.string(),
@@ -53,12 +54,6 @@ export async function dailyDiet(app: FastifyInstance) {
       )
       const { id } = idParams.parse(request.params)
       const { sessionId } = request.cookies
-
-      const diet = await knex('daily_diet').where({ session_id: sessionId, id })
-
-      if (!diet.length) {
-        throw new Error('diet not found')
-      }
 
       await knex('daily_diet').where({ session_id: sessionId, id }).update({
         id,
