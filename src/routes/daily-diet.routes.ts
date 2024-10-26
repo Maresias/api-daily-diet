@@ -98,23 +98,29 @@ export async function dailyDiet(app: FastifyInstance) {
     return { diets }
   })
 
-  app.get('/:id', { preHandler: [checkSessionIdExist] }, async (request) => {
-    const { sessionId } = request.cookies
+  app.get(
+    '/:id',
+    { preHandler: [checkSessionIdExist] },
+    async (request, reply) => {
+      const { sessionId } = request.cookies
 
-    const idParamsSchema = z.object({
-      id: z.string().uuid(),
-    })
-    const { id } = idParamsSchema.parse(request.params)
+      const idParamsSchema = z.object({
+        id: z.string().uuid(),
+      })
+      const { id } = idParamsSchema.parse(request.params)
 
-    const diet = await knex('daily_diet')
-      .where({ session_id: sessionId, id })
-      .first()
+      const diet = await knex('daily_diet')
+        .where({ session_id: sessionId, id })
+        .first()
 
-    if (!diet) {
-      throw new Error('diet not found')
-    }
-    return { diet }
-  })
+      if (!diet) {
+        return reply.status(404).send({
+          error: 'Diet not found',
+        })
+      }
+      return { diet }
+    },
+  )
 
   app.get(
     '/metrics',
@@ -165,11 +171,14 @@ export async function dailyDiet(app: FastifyInstance) {
           'Melhor sequência de refeições dentro da dieta': bestSequel,
         },
       ]
+      const metrics = [
+        ...allDiet,
+        ...totalNumberOfMealsOutsideTheDiet,
+        ...totalNumberOfMealsWithinTheDiet,
+        ...bestSequenceOfMealsWithinTheDiet,
+      ]
       return {
-        allDiet,
-        totalNumberOfMealsWithinTheDiet,
-        totalNumberOfMealsOutsideTheDiet,
-        bestSequenceOfMealsWithinTheDiet,
+        metrics,
       }
     },
   )
