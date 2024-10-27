@@ -130,16 +130,16 @@ export async function dailyDiet(app: FastifyInstance) {
 
       const allDiet = await knex('daily_diet')
         .where({ session_id: sessionId })
-        .count('id', { as: 'Total de refeições registradas' })
+        .count('id', { as: 'totalDeRefeiçõesRegistradas' })
 
       const totalNumberOfMealsWithinTheDiet = await knex('daily_diet')
         .where({
           session_id: sessionId,
         })
-        .sum('my_diet_is_ok', { as: 'total de refeições dentro da dieta' })
+        .sum('my_diet_is_ok', { as: 'totalDeRefeiçõesDentroDaDieta' })
 
       const totalNumberOfMealsOutsideTheDiet = await knex('daily_diet')
-        .count('my_diet_is_ok', { as: 'total de refeições fora da dieta' })
+        .count('my_diet_is_ok', { as: 'totalDeRefeiçõesForaDaDieta' })
         .where({ session_id: sessionId })
         .where('my_diet_is_ok', 0)
 
@@ -168,17 +168,27 @@ export async function dailyDiet(app: FastifyInstance) {
       }
       const bestSequenceOfMealsWithinTheDiet = [
         {
-          'Melhor sequência de refeições dentro da dieta': bestSequel,
+          MelhorSequênciaDeRefeiçõesDentroDaDieta: bestSequel,
         },
       ]
-      const metrics = [
+      const dietMetrics = [
         ...allDiet,
         ...totalNumberOfMealsOutsideTheDiet,
         ...totalNumberOfMealsWithinTheDiet,
         ...bestSequenceOfMealsWithinTheDiet,
       ]
+
+      const originalData = { dietMetrics }
+
+      const metrics = {
+        dietMetrics: {},
+      }
+
+      originalData.dietMetrics.forEach((metric) => {
+        Object.assign(metrics.dietMetrics, metric)
+      })
       return {
-        metrics,
+        ...metrics,
       }
     },
   )

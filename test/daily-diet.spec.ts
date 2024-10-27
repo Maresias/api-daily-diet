@@ -235,8 +235,8 @@ describe('daily-diet', () => {
       .set('Cookie', sessionId)
       .expect(200)
 
-    expect(metrics.body.metrics).toEqual([
-      expect.objectContaining({ 'Total de refeições registradas': 1 }),
-    ])
+    expect(metrics.body.dietMetrics).toEqual(
+      expect.objectContaining({ totalDeRefeiçõesRegistradas: 1 }),
+    )
   })
 })
