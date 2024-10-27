@@ -13,7 +13,7 @@ describe('daily-diet', () => {
   })
 
   beforeEach(async () => {
-    execSync('npm run knex -- migrate:rollback --all')
+    execSync('npm run knex -- migrate:rollback ')
     execSync('npm run knex -- migrate:latest')
   })
 
