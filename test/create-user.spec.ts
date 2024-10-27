@@ -13,7 +13,7 @@ describe('Create user', () => {
   })
 
   beforeEach(async () => {
-    execSync('npm run knex -- migrate:rollback ')
+    execSync('npm run knex -- migrate:rollback --all')
     execSync('npm run knex -- migrate:latest')
   })
   it('must be able to create a user', async () => {
