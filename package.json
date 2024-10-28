@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Api web/moblie de dieta",
   "main": "index.js",
+  "engines": {
+    "node": ">= 18"
+  },
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "lint": "eslint src --ext .ts -- fix",
